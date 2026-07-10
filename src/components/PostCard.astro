@@ -1,0 +1,70 @@
+---
+import SanityImage from "@/components/SanityImage.tsx";
+import type { Lang } from "@/i18n/ui";
+import { postPath, ui } from "@/i18n/ui";
+import type { LatestPost } from "@/sanity/lib/queries";
+
+interface Props {
+	lang: Lang;
+	post: LatestPost;
+}
+
+const { lang, post } = Astro.props;
+
+const meta = [
+	post.readingTime
+		? `☕ ${post.readingTime} ${ui[lang]["featured.readingMeta"]}`
+		: null,
+	post.photoCount ? `${post.photoCount} ${ui[lang]["featured.photos"]}` : null,
+]
+	.filter(Boolean)
+	.join(" · ");
+
+const date = post.publishedAt
+	? new Intl.DateTimeFormat(lang === "pl" ? "pl-PL" : "en-US", {
+			day: "numeric",
+			month: "long",
+			year: "numeric",
+		}).format(new Date(post.publishedAt))
+	: null;
+---
+
+<a
+	href={postPath(lang, post.country.slug, post.slug)}
+	class="group flex flex-col gap-3 rounded-[16px] border border-border bg-card p-3 transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_24px_rgba(31,27,22,0.1)] md:rounded-[18px] md:p-3.5"
+>
+	<div
+		class="relative aspect-[16/10] overflow-hidden rounded-[11px] md:rounded-[13px]"
+	>
+		<SanityImage
+			image={post.coverImage}
+			width={720}
+			height={450}
+			className="transition-transform duration-500 group-hover:scale-[1.03]"
+		/>
+	</div>
+	<div class="flex flex-col gap-1.5 px-1 pb-1">
+		<span
+			class="font-mono text-[10px] uppercase tracking-[0.05em] text-primary md:text-[10.5px]"
+		>
+			{post.country.name}
+		</span>
+		<h3
+			class="font-display text-lg font-semibold leading-[1.18] tracking-[-0.01em] md:text-[21px]"
+		>
+			{post.title}
+		</h3>
+		{post.excerpt && (
+			<p class="line-clamp-2 text-sm leading-[1.5] text-muted-foreground">
+				{post.excerpt}
+			</p>
+		)}
+		<div
+			class="mt-0.5 flex items-center gap-2 font-mono text-[11px] text-subtle-foreground"
+		>
+			{meta && <span>{meta}</span>}
+			{meta && date && <span aria-hidden="true">·</span>}
+			{date && <span>{date}</span>}
+		</div>
+	</div>
+</a>

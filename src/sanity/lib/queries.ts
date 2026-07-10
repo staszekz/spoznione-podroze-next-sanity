@@ -149,3 +149,37 @@ const POST_QUERY = defineQuery(/* groq */ `
 export async function getPost(lang: Lang, country: string, slug: string) {
 	return await sanityClient.fetch(POST_QUERY, { lang, country, slug });
 }
+
+export interface LatestPost {
+	_id: string;
+	title: string;
+	slug: string;
+	excerpt: string | null;
+	readingTime: number | null;
+	photoCount: number | null;
+	publishedAt: string | null;
+	coverImage: SanityImage | null;
+	country: { name: string; slug: string };
+}
+
+const LATEST_POSTS_QUERY = defineQuery(/* groq */ `
+	*[_type == "post" && language == $lang && defined(country->slug[$lang].current)]
+		| order(publishedAt desc) {
+		_id,
+		title,
+		"slug": slug.current,
+		excerpt,
+		readingTime,
+		photoCount,
+		publishedAt,
+		coverImage { ${imageFragment} },
+		country->{
+			"name": name[$lang],
+			"slug": slug[$lang].current
+		}
+	}
+`);
+
+export async function getLatestPosts(lang: Lang): Promise<LatestPost[]> {
+	return await sanityClient.fetch(LATEST_POSTS_QUERY, { lang });
+}
