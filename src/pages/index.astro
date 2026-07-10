@@ -9,8 +9,9 @@ import { getHomepageData } from "@/sanity/lib/queries";
 
 const lang = "pl" as const;
 const data = await getHomepageData(lang);
-const defaultId =
-	[...data.continents].sort((a, b) => b.postCount - a.postCount)[0]?._id ?? "";
+// getHomepageData sorts continents by postCount desc, so [0] is the default.
+const defaultId = data.continents[0]?._id;
+if (!defaultId) return Astro.redirect("/kontynenty");
 ---
 
 <BaseLayout lang={lang} description={SITE_DESCRIPTION.pl} altHref="/en/">

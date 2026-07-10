@@ -13,7 +13,9 @@ export async function getStaticPaths() {
 
 const lang = "pl" as const;
 const slug = Astro.params.slug ?? "";
-const post = await getPost(lang, slug);
+const country = Astro.params.country ?? "";
+const post = await getPost(lang, country, slug);
+if (!post) return Astro.redirect("/404");
 const meta = [
 	post?.readingTime
 		? `☕ ${post.readingTime} ${ui[lang]["featured.readingMeta"]}`

@@ -120,11 +120,17 @@ const POST_SLUGS_QUERY = defineQuery(/* groq */ `
 export async function getPostSlugs(
 	lang: Lang,
 ): Promise<{ slug: string; country: string }[]> {
-	return await sanityClient.fetch(POST_SLUGS_QUERY, { lang });
+	const slugs: { slug: string; country: string | null }[] =
+		await sanityClient.fetch(POST_SLUGS_QUERY, { lang });
+	// Posts with a missing/unresolved country ref yield null — drop them so
+	// getStaticPaths never emits `/undefined/slug` or crashes on the null param.
+	return slugs.filter((s): s is { slug: string; country: string } =>
+		Boolean(s.country),
+	);
 }
 
 const POST_QUERY = defineQuery(/* groq */ `
-	*[_type == "post" && language == $lang && slug.current == $slug][0] {
+	*[_type == "post" && language == $lang && slug.current == $slug && country->slug[$lang].current == $country][0] {
 		_id,
 		title,
 		excerpt,
@@ -140,6 +146,6 @@ const POST_QUERY = defineQuery(/* groq */ `
 	}
 `);
 
-export async function getPost(lang: Lang, slug: string) {
-	return await sanityClient.fetch(POST_QUERY, { lang, slug });
+export async function getPost(lang: Lang, country: string, slug: string) {
+	return await sanityClient.fetch(POST_QUERY, { lang, country, slug });
 }
