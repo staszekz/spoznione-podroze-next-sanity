@@ -1,0 +1,39 @@
+---
+import PostCard from "@/components/PostCard.astro";
+import { ui } from "@/i18n/ui";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getLatestPosts } from "@/sanity/lib/queries";
+
+const lang = "pl" as const;
+const posts = await getLatestPosts(lang);
+---
+
+<BaseLayout
+	lang={lang}
+	title={ui[lang]["latest.title"]}
+	description={ui[lang]["latest.lead"]}
+	altHref="/en/latest"
+>
+	<section class="flex flex-col gap-6 py-10 md:py-14">
+		<div class="flex flex-col gap-2">
+			<h1
+				class="font-display text-4xl font-bold tracking-[-0.03em] md:text-5xl"
+			>
+				{ui[lang]["latest.title"]}
+			</h1>
+			<p class="max-w-[520px] text-lg text-muted-foreground">
+				{ui[lang]["latest.lead"]}
+			</p>
+		</div>
+
+		{posts.length === 0 ? (
+			<p class="py-10 text-muted-foreground">{ui[lang]["latest.empty"]}</p>
+		) : (
+			<div class="grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
+				{posts.map((post) => (
+					<PostCard lang={lang} post={post} />
+				))}
+			</div>
+		)}
+	</section>
+</BaseLayout>

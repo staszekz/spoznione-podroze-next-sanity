@@ -10,7 +10,9 @@
 		"includes": [
 			"**",
 			"!src/content/**/*.md",
-			"!src/content/**/*.mdx"
+			"!src/content/**/*.mdx",
+			"!public",
+			"!src/styles/global.css"
 		]
 	},
 	"formatter": {
@@ -41,5 +43,23 @@
 				"organizeImports": "on"
 			}
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.css"],
+			"linter": {
+				"enabled": false
+			}
+		},
+		{
+			"includes": ["**/*.astro"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"useJsxKeyInIterable": "off"
+					}
+				}
+			}
+		}
+	]
 }

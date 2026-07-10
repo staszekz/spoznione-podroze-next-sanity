@@ -1,0 +1,16 @@
+# Spóźnione Podróże
+
+> Foto-centryczny blog podróżniczy pisany z dystansu czasu (PL/EN).
+> A photo-centric travel blog written with the distance of time (PL/EN).
+
+Struktura treści / content hierarchy: kontynent → kraj → post.
+
+## Strony / Pages
+
+- [Strona główna (PL)](https://spoznionepodroze.pl/)
+- [Homepage (EN)](https://spoznionepodroze.pl/en/)
+
+## Dla agentów / For agents
+
+Planowany endpoint MCP: mcp.spoznionepodroze.pl (narzędzia: searchArticles, getDestinationInfo) — jeszcze niedostępny.
+Planned MCP endpoint: mcp.spoznionepodroze.pl (tools: searchArticles, getDestinationInfo) — not live yet.

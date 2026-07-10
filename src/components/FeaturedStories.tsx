@@ -1,0 +1,115 @@
+import { useStore } from "@nanostores/react";
+import SanityImage from "@/components/SanityImage";
+import type { Lang } from "@/i18n/ui";
+import { postMeta, postPath, routes, ui } from "@/i18n/ui";
+import type { ContinentSummary, StoryCard } from "@/sanity/lib/queries";
+import { $activeContinent } from "@/stores/activeContinent";
+
+interface FeaturedStoriesProps {
+	continents: ContinentSummary[];
+	stories: StoryCard[];
+	defaultId: string;
+	lang: Lang;
+}
+
+function StoryMeta({ story, lang }: { story: StoryCard; lang: Lang }) {
+	const meta = postMeta(lang, story.readingTime, story.photoCount);
+	if (!meta) return null;
+	return (
+		<span className="font-mono text-[11.5px] text-subtle-foreground">
+			{meta}
+		</span>
+	);
+}
+
+export default function FeaturedStories({
+	continents,
+	stories,
+	defaultId,
+	lang,
+}: FeaturedStoriesProps) {
+	const selected = useStore($activeContinent) ?? defaultId;
+	const continent = continents.find((c) => c._id === selected);
+	const filtered = stories
+		.filter((s) => s.country?.continentId === selected)
+		.slice(0, 3);
+	const [main, ...side] = filtered;
+
+	return (
+		<section className="flex flex-col gap-4 py-6 md:gap-[18px] md:py-7">
+			<div className="flex items-baseline justify-between">
+				<h2 className="font-display text-[21px] font-bold tracking-[-0.01em] md:text-[26px]">
+					{continent?.name} · {ui[lang]["featured.heading"]}
+				</h2>
+				<a
+					href={routes[lang].continents}
+					className="text-[13px] font-semibold text-primary hover:text-primary-dark md:text-[15px]"
+				>
+					{ui[lang]["featured.allCountries"]} →
+				</a>
+			</div>
+
+			<div className="grid gap-4 md:grid-cols-[1.5fr_1fr] md:gap-6">
+				{main?.country && (
+					<a
+						href={postPath(lang, main.country.slug, main.slug)}
+						className="group relative block h-[300px] overflow-hidden rounded-[18px] md:h-[440px] md:rounded-[20px]"
+					>
+						<SanityImage
+							image={main.coverImage}
+							width={880}
+							height={440}
+							loading="eager"
+							fetchPriority="high"
+							className="transition-transform duration-500 group-hover:scale-[1.03]"
+						/>
+						<div className="pointer-events-none absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-scrim/80 to-transparent" />
+						<div className="pointer-events-none absolute inset-x-[18px] bottom-[18px] flex flex-col gap-2 md:inset-x-7 md:bottom-7">
+							<span className="font-mono text-[10px] uppercase tracking-[0.08em] text-on-image-eyebrow md:text-[11px]">
+								{main.country.name} · {continent?.name}
+							</span>
+							<span className="font-display text-[25px] font-bold leading-[1.08] tracking-[-0.02em] text-on-image md:text-4xl md:leading-[1.06]">
+								{main.title}
+							</span>
+							{main.excerpt && (
+								<p className="hidden max-w-[440px] text-[15px] leading-normal text-on-image/90 md:block">
+									{main.excerpt}
+								</p>
+							)}
+						</div>
+					</a>
+				)}
+
+				<div className="flex flex-col gap-4 md:gap-6">
+					{side.map(
+						(story) =>
+							story.country && (
+								<a
+									key={story._id}
+									href={postPath(lang, story.country.slug, story.slug)}
+									className="flex flex-1 gap-3 rounded-[14px] border border-border bg-card p-3 transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_24px_rgba(31,27,22,0.1)] md:gap-4 md:rounded-2xl md:p-3.5"
+								>
+									<div className="relative size-[92px] flex-none overflow-hidden rounded-[10px] md:h-auto md:w-[120px] md:rounded-xl">
+										<SanityImage
+											image={story.coverImage}
+											width={240}
+											height={240}
+										/>
+									</div>
+									<div className="flex flex-col gap-1 self-center md:gap-1.5">
+										<span className="font-mono text-[10px] uppercase tracking-[0.05em] text-primary md:text-[10.5px]">
+											{story.country.name}
+										</span>
+										<span className="font-display text-base font-semibold leading-[1.2] md:text-[19px] md:leading-[1.16]">
+											{story.title}
+										</span>
+										<StoryMeta story={story} lang={lang} />
+									</div>
+								</a>
+							),
+					)}
+				</div>
+			</div>
+		</section>
+	);
+}

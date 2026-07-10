@@ -1,38 +1,62 @@
 // @ts-check
 
-import mdx from '@astrojs/mdx';
-import sitemap from '@astrojs/sitemap';
-import { defineConfig, fontProviders } from 'astro/config';
+import react from "@astrojs/react";
+import sitemap from "@astrojs/sitemap";
+import sanity from "@sanity/astro";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig, fontProviders } from "astro/config";
+import { loadEnv } from "vite";
 
-import sanity from '@sanity/astro';
-import react from '@astrojs/react';
+const { PUBLIC_SANITY_PROJECT_ID, PUBLIC_SANITY_DATASET } = loadEnv(
+	process.env.NODE_ENV ?? "development",
+	process.cwd(),
+	"",
+);
 
 // https://astro.build/config
 export default defineConfig({
-    site: 'https://example.com',
-    integrations: [mdx(), sitemap(), sanity(), react()],
-    fonts: [
-        {
-            provider: fontProviders.local(),
-            name: 'Atkinson',
-            cssVariable: '--font-atkinson',
-            fallbacks: ['sans-serif'],
-            options: {
-                variants: [
-                    {
-                        src: ['./src/assets/fonts/atkinson-regular.woff'],
-                        weight: 400,
-                        style: 'normal',
-                        display: 'swap',
-                    },
-                    {
-                        src: ['./src/assets/fonts/atkinson-bold.woff'],
-                        weight: 700,
-                        style: 'normal',
-                        display: 'swap',
-                    },
-                ],
-            },
-        },
-    ],
+	site: "https://spoznionepodroze.pl",
+	i18n: {
+		defaultLocale: "pl",
+		locales: ["pl", "en"],
+	},
+	integrations: [
+		sitemap(),
+		sanity({
+			projectId: PUBLIC_SANITY_PROJECT_ID,
+			dataset: PUBLIC_SANITY_DATASET,
+			useCdn: false,
+			apiVersion: "2026-07-01",
+		}),
+		react(),
+	],
+	vite: {
+		plugins: [tailwindcss()],
+	},
+	fonts: [
+		{
+			provider: fontProviders.google(),
+			name: "Bricolage Grotesque",
+			cssVariable: "--font-bricolage",
+			weights: [600, 700, 800],
+			subsets: ["latin", "latin-ext"],
+			fallbacks: ["sans-serif"],
+		},
+		{
+			provider: fontProviders.google(),
+			name: "Hanken Grotesk",
+			cssVariable: "--font-hanken",
+			weights: [400, 500, 600],
+			subsets: ["latin", "latin-ext"],
+			fallbacks: ["sans-serif"],
+		},
+		{
+			provider: fontProviders.google(),
+			name: "DM Mono",
+			cssVariable: "--font-dm-mono",
+			weights: [400, 500],
+			subsets: ["latin", "latin-ext"],
+			fallbacks: ["monospace"],
+		},
+	],
 });
