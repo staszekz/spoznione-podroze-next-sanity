@@ -1,7 +1,7 @@
 ---
 import SanityImage from "@/components/SanityImage.tsx";
 import type { Lang } from "@/i18n/ui";
-import { postPath, ui } from "@/i18n/ui";
+import { postMeta, postPath } from "@/i18n/ui";
 import type { LatestPost } from "@/sanity/lib/queries";
 
 interface Props {
@@ -11,14 +11,7 @@ interface Props {
 
 const { lang, post } = Astro.props;
 
-const meta = [
-	post.readingTime
-		? `☕ ${post.readingTime} ${ui[lang]["featured.readingMeta"]}`
-		: null,
-	post.photoCount ? `${post.photoCount} ${ui[lang]["featured.photos"]}` : null,
-]
-	.filter(Boolean)
-	.join(" · ");
+const meta = postMeta(lang, post.readingTime, post.photoCount);
 
 const date = post.publishedAt
 	? new Intl.DateTimeFormat(lang === "pl" ? "pl-PL" : "en-US", {

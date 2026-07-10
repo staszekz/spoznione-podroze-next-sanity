@@ -13,6 +13,22 @@ const imageFragment = /* groq */ `
 	alt
 `;
 
+const postCardFragment = /* groq */ `
+	_id,
+	title,
+	"slug": slug.current,
+	excerpt,
+	readingTime,
+	photoCount,
+	publishedAt,
+	coverImage { ${imageFragment} },
+	country->{
+		"name": name[$lang],
+		"slug": slug[$lang].current,
+		"continentId": continent._ref
+	}
+`;
+
 export interface SanityImage {
 	asset: {
 		_id: string;
@@ -78,18 +94,7 @@ const HOMEPAGE_QUERY = defineQuery(/* groq */ `{
 	},
 	"stories": *[_type == "post" && language == $lang]
 		| order(coalesce(featured, false) desc, publishedAt desc) {
-		_id,
-		title,
-		"slug": slug.current,
-		excerpt,
-		readingTime,
-		photoCount,
-		coverImage { ${imageFragment} },
-		country->{
-			"name": name[$lang],
-			"slug": slug[$lang].current,
-			"continentId": continent._ref
-		}
+		${postCardFragment}
 	},
 	"countries": *[_type == "country"] {
 		_id,
@@ -110,8 +115,10 @@ export async function getHomepageData(lang: Lang): Promise<HomepageData> {
 	return data;
 }
 
+// The country filter keeps posts with a missing/unresolved country ref out of
+// the result, so getStaticPaths never emits `/undefined/slug`.
 const POST_SLUGS_QUERY = defineQuery(/* groq */ `
-	*[_type == "post" && defined(slug.current) && language == $lang] {
+	*[_type == "post" && defined(slug.current) && language == $lang && defined(country->slug[$lang].current)] {
 		"slug": slug.current,
 		"country": country->slug[$lang].current
 	}
@@ -120,29 +127,13 @@ const POST_SLUGS_QUERY = defineQuery(/* groq */ `
 export async function getPostSlugs(
 	lang: Lang,
 ): Promise<{ slug: string; country: string }[]> {
-	const slugs: { slug: string; country: string | null }[] =
-		await sanityClient.fetch(POST_SLUGS_QUERY, { lang });
-	// Posts with a missing/unresolved country ref yield null — drop them so
-	// getStaticPaths never emits `/undefined/slug` or crashes on the null param.
-	return slugs.filter((s): s is { slug: string; country: string } =>
-		Boolean(s.country),
-	);
+	return await sanityClient.fetch(POST_SLUGS_QUERY, { lang });
 }
 
 const POST_QUERY = defineQuery(/* groq */ `
 	*[_type == "post" && language == $lang && slug.current == $slug && country->slug[$lang].current == $country][0] {
-		_id,
-		title,
-		excerpt,
-		readingTime,
-		photoCount,
-		publishedAt,
-		coverImage { ${imageFragment} },
-		body,
-		country->{
-			"name": name[$lang],
-			"slug": slug[$lang].current
-		}
+		${postCardFragment},
+		body
 	}
 `);
 
@@ -165,18 +156,7 @@ export interface LatestPost {
 const LATEST_POSTS_QUERY = defineQuery(/* groq */ `
 	*[_type == "post" && language == $lang && defined(country->slug[$lang].current)]
 		| order(publishedAt desc) {
-		_id,
-		title,
-		"slug": slug.current,
-		excerpt,
-		readingTime,
-		photoCount,
-		publishedAt,
-		coverImage { ${imageFragment} },
-		country->{
-			"name": name[$lang],
-			"slug": slug[$lang].current
-		}
+		${postCardFragment}
 	}
 `);
 

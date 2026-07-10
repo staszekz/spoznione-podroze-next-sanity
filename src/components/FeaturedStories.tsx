@@ -1,7 +1,7 @@
 import { useStore } from "@nanostores/react";
 import SanityImage from "@/components/SanityImage";
 import type { Lang } from "@/i18n/ui";
-import { postPath, routes, ui } from "@/i18n/ui";
+import { postMeta, postPath, routes, ui } from "@/i18n/ui";
 import type { ContinentSummary, StoryCard } from "@/sanity/lib/queries";
 import { $activeContinent } from "@/stores/activeContinent";
 
@@ -13,18 +13,11 @@ interface FeaturedStoriesProps {
 }
 
 function StoryMeta({ story, lang }: { story: StoryCard; lang: Lang }) {
-	if (!story.readingTime && !story.photoCount) return null;
-	const parts = [
-		story.readingTime
-			? `☕ ${story.readingTime} ${ui[lang]["featured.readingMeta"]}`
-			: null,
-		story.photoCount
-			? `${story.photoCount} ${ui[lang]["featured.photos"]}`
-			: null,
-	].filter(Boolean);
+	const meta = postMeta(lang, story.readingTime, story.photoCount);
+	if (!meta) return null;
 	return (
 		<span className="font-mono text-[11.5px] text-subtle-foreground">
-			{parts.join(" · ")}
+			{meta}
 		</span>
 	);
 }

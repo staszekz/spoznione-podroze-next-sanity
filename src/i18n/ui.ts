@@ -40,6 +40,9 @@ export const ui = {
 		"menu.open": "Otwórz menu",
 		"menu.close": "Zamknij menu",
 		"stub.wip": "Ta strona jest w budowie — wróć wkrótce.",
+		"notFound.title": "Nie znaleziono strony",
+		"notFound.lead": "Ta strona nie istnieje albo została przeniesiona.",
+		"notFound.cta": "Wróć na stronę główną",
 	},
 	en: {
 		"nav.continents": "Continents",
@@ -73,6 +76,9 @@ export const ui = {
 		"menu.open": "Open menu",
 		"menu.close": "Close menu",
 		"stub.wip": "This page is under construction — check back soon.",
+		"notFound.title": "Page not found",
+		"notFound.lead": "This page doesn't exist or has been moved.",
+		"notFound.cta": "Back to the homepage",
 	},
 } as const;
 
@@ -112,6 +118,22 @@ export const routes = {
 		collab: "/en/work-with-me",
 	},
 } as const;
+
+/** Builds the "☕ 5 min · 12 photos" post meta line; empty string when both are missing. */
+export function postMeta(
+	lang: Lang,
+	readingTime: number | null | undefined,
+	photoCount: number | null | undefined,
+): string {
+	return [
+		readingTime
+			? `☕ ${readingTime} ${ui[lang]["featured.readingMeta"]}`
+			: null,
+		photoCount ? `${photoCount} ${ui[lang]["featured.photos"]}` : null,
+	]
+		.filter(Boolean)
+		.join(" · ");
+}
 
 /** Builds the URL of a post page: `/{countrySlug}/{postSlug}` (EN under `/en/`). */
 export function postPath(
