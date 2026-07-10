@@ -27,7 +27,6 @@ export default defineConfig({
 			dataset: PUBLIC_SANITY_DATASET,
 			useCdn: false,
 			apiVersion: "2026-07-01",
-			studioBasePath: "/studio",
 		}),
 		react(),
 	],
