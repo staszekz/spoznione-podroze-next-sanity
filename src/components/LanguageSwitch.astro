@@ -1,0 +1,37 @@
+---
+import type { Lang } from "@/i18n/ui";
+
+interface Props {
+	lang: Lang;
+	/** URL of this page in the other language. */
+	altHref?: string;
+}
+
+const { lang, altHref } = Astro.props;
+const plHref = lang === "pl" ? undefined : (altHref ?? "/");
+const enHref = lang === "en" ? undefined : (altHref ?? "/en/");
+
+const activeClass = "bg-foreground text-background";
+const inactiveClass = "text-subtle-foreground hover:text-foreground";
+const segmentClass =
+	"rounded-full px-3 py-[5px] text-[13px] font-semibold transition-colors";
+---
+
+<div
+	class="flex items-center gap-0.5 rounded-full border border-border p-[3px]"
+>
+	{plHref ? (
+			<a href={plHref} class={`${segmentClass} ${inactiveClass}`}>
+				PL
+			</a>
+		) : (
+			<span class={`${segmentClass} ${activeClass}`}>PL</span>
+		)}
+	{enHref ? (
+			<a href={enHref} class={`${segmentClass} ${inactiveClass}`}>
+				EN
+			</a>
+		) : (
+			<span class={`${segmentClass} ${activeClass}`}>EN</span>
+		)}
+</div>

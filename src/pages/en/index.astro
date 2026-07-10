@@ -7,13 +7,13 @@ import { SITE_DESCRIPTION } from "@/consts";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getHomepageData } from "@/sanity/lib/queries";
 
-const lang = "pl" as const;
+const lang = "en" as const;
 const data = await getHomepageData(lang);
 const defaultId =
 	[...data.continents].sort((a, b) => b.postCount - a.postCount)[0]?._id ?? "";
 ---
 
-<BaseLayout lang={lang} description={SITE_DESCRIPTION.pl} altHref="/en/">
+<BaseLayout lang={lang} description={SITE_DESCRIPTION.en} altHref="/">
 	<Hero
 		lang={lang}
 		continents={data.continents}

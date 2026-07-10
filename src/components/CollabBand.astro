@@ -1,0 +1,49 @@
+---
+import type { Lang } from "@/i18n/ui";
+import { getTranslations, routes } from "@/i18n/ui";
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = getTranslations(lang);
+const r = routes[lang];
+---
+
+<section class="py-6 md:py-9">
+	<div
+		class="flex flex-col gap-3.5 rounded-[18px] p-6 md:flex-row md:items-center md:justify-between md:gap-6 md:rounded-[22px] md:px-[38px] md:py-9"
+		style="background:linear-gradient(120deg, var(--primary), var(--primary-dark))"
+	>
+		<div class="flex flex-col gap-2">
+			<span
+				class="font-mono text-[10px] tracking-[0.08em] text-collab-eyebrow md:text-[11px]"
+			>
+				{t('collab.eyebrow')}
+			</span>
+			<h2
+				class="font-display text-[23px] font-bold leading-[1.15] text-on-image md:text-[30px]"
+			>
+				{t('collab.title')}
+			</h2>
+			<p class="hidden max-w-[520px] text-[15px] text-on-image/90 md:block">
+				{t('collab.lead')}
+			</p>
+		</div>
+		<div class="flex gap-2.5 md:flex-none md:flex-col">
+			<a
+				href={r.about}
+				class="flex h-[46px] flex-1 items-center justify-center rounded-full bg-background px-[26px] text-sm font-semibold text-foreground md:flex-none md:text-[15px]"
+			>
+				{t('collab.ctaAbout')}
+			</a>
+			<a
+				href={r.collab}
+				class="flex h-[46px] flex-1 items-center justify-center rounded-full border border-on-image/60 px-[26px] text-sm font-semibold text-on-image md:flex-none md:text-[15px]"
+			>
+				{t('collab.ctaCollab')}
+			</a>
+		</div>
+	</div>
+</section>

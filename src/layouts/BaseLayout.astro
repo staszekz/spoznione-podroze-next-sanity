@@ -1,0 +1,57 @@
+---
+import { Font } from "astro:assets";
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import { SITE_TITLE } from "@/consts";
+import type { Lang } from "@/i18n/ui";
+import "@/styles/global.css";
+
+interface Props {
+	lang: Lang;
+	title?: string;
+	description: string;
+	/** URL of this page in the other language, for the PL|EN switcher. */
+	altHref?: string;
+}
+
+const { lang, title, description, altHref } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
+---
+
+<!doctype html>
+<html lang={lang}>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>{pageTitle}</title>
+		<meta name="description" content={description}>
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+		<link rel="sitemap" href="/sitemap-index.xml">
+		<meta property="og:title" content={pageTitle}>
+		<meta property="og:description" content={description}>
+		<meta property="og:type" content="website">
+		<Font cssVariable="--font-bricolage" preload />
+		<Font cssVariable="--font-hanken" preload />
+		<Font cssVariable="--font-dm-mono" />
+		<script is:inline>
+		(() => {
+			const stored = localStorage.getItem("theme");
+			const dark = stored
+				? stored === "dark"
+				: window.matchMedia("(prefers-color-scheme: dark)").matches;
+			document.documentElement.classList.toggle("dark", dark);
+		})();
+		</script>
+	</head>
+	<body>
+		<div
+			class="mx-auto flex min-h-screen w-full max-w-[1200px] flex-col px-5 md:px-7"
+		>
+			<Header lang={lang} altHref={altHref} />
+			<main class="flex-1">
+				<slot />
+			</main>
+			<Footer lang={lang} />
+		</div>
+	</body>
+</html>
